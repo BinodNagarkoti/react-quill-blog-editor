@@ -4,10 +4,20 @@
   "description": "A React wrapper around Quill 2 preconfigured for blog content: fonts, tables, colors, alignment, line spacing, and non-base64 image uploads.",
   "type": "module",
   "license": "MIT",
-  "keywords": ["react", "quill", "rich-text-editor", "wysiwyg", "blog"],
-  "files": ["dist", "bin", ".claude/skills/react-quill-blog-editor/SKILL.md"],
+  "keywords": [
+    "react",
+    "quill",
+    "rich-text-editor",
+    "wysiwyg",
+    "blog"
+  ],
+  "files": [
+    "dist",
+    "bin",
+    ".claude/skills/react-quill-blog-editor/SKILL.md"
+  ],
   "bin": {
-    "react-quill-blog-editor": "./bin/cli.js"
+    "react-quill-blog-editor": "bin/cli.js"
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -20,7 +30,9 @@
     },
     "./style.css": "./dist/style.css"
   },
-  "sideEffects": ["*.css"],
+  "sideEffects": [
+    "*.css"
+  ],
   "scripts": {
     "dev": "vite --config example/vite.config.ts",
     "build": "vite build && tsc -p tsconfig.build.json",
