@@ -16,3 +16,4 @@ example/public/uploads/*
 !example/public/uploads/.gitkeep
 .env
 .git-credentials
+.claude/settings.local.json
