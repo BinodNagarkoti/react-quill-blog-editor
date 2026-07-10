@@ -1,7 +1,8 @@
-import { forwardRef, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
+import { forwardRef, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Quill, { Delta, Range, type EmitterSource } from 'quill';
 import type { ToolbarConfig } from 'quill/modules/toolbar.js';
 import 'quill/dist/quill.snow.css';
+import './theme/theme.css';
 
 import { FONT_OPTIONS, registerFonts, injectFontStyles, type FontOption } from './formats/fonts.ts';
 import { registerLineHeight, injectLineHeightStyles } from './formats/lineHeight.ts';
@@ -12,6 +13,21 @@ import { warnIfKatexMissing } from './toolbar/formula.ts';
 import { injectToolbarStyles, insertToolbarSeparators } from './toolbar/toolbarStyles.ts';
 import { applyToolbarTitles } from './toolbar/toolbarTitles.ts';
 import { createTooltipBoundsElement } from './toolbar/tooltipBounds.ts';
+import {
+  createThemeToggleHandler,
+  registerThemeToggleIcon,
+  updateThemeToggleButton,
+  type BinaryTheme,
+} from './toolbar/themeToggle.ts';
+import type { ThemeMode } from './theme/themeMode.ts';
+
+function resolveInitialBinaryTheme(theme: ThemeMode): BinaryTheme {
+  if (theme === 'dark') return 'dark';
+  if (theme === 'auto' && typeof window !== 'undefined' && window.matchMedia) {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  return 'light';
+}
 
 export interface QuillBlogEditorProps {
   readOnly?: boolean;
@@ -37,6 +53,23 @@ export interface QuillBlogEditorProps {
   toolbar?: ToolbarConfig;
   /** Extra Quill modules merged in alongside toolbar/table. */
   modules?: Record<string, unknown>;
+  /**
+   * Built-in color theme. `'auto'` follows the OS/browser's
+   * `prefers-color-scheme`. Default `'light'`. **Live** - toggling it
+   * re-themes in place without losing content.
+   */
+  theme?: ThemeMode;
+  /**
+   * Shows a sun/moon toggle button in the toolbar so the theme can be flipped
+   * from inside the editor, with no external control needed. Default false.
+   * Once enabled, `theme` only sets the *starting* appearance (`'auto'`
+   * resolves once, at mount, via `prefers-color-scheme`) - the toolbar button
+   * then owns it from there. Live - toggling this prop rebuilds the toolbar
+   * in place without losing content.
+   */
+  enableThemeToggle?: boolean;
+  /** Fires when the in-toolbar theme button is clicked. Only relevant with `enableThemeToggle`. */
+  onThemeChange?: (theme: BinaryTheme) => void;
   onTextChange?: (delta: Delta, oldContents: Delta, source: EmitterSource) => void;
   onSelectionChange?: (
     range: Range | null,
@@ -58,6 +91,9 @@ const QuillBlogEditor = forwardRef<Quill, QuillBlogEditorProps>(
       fonts = FONT_OPTIONS,
       toolbar,
       modules,
+      theme = 'light',
+      enableThemeToggle = false,
+      onThemeChange,
       onTextChange,
       onSelectionChange,
     },
@@ -67,10 +103,18 @@ const QuillBlogEditor = forwardRef<Quill, QuillBlogEditorProps>(
     const defaultValueRef = useRef(defaultValue);
     const onTextChangeRef = useRef(onTextChange);
     const onSelectionChangeRef = useRef(onSelectionChange);
+    const onThemeChangeRef = useRef(onThemeChange);
     const onFileUploadRef = useRef(onFileUpload);
     // Carries content across an enableTable/enableFormula-triggered rebuild (see
     // below) so toggling those doesn't wipe what the user has typed.
     const pendingContentRef = useRef<Delta | null>(null);
+
+    // Only meaningful when enableThemeToggle is on - the toolbar button flips
+    // this instead of the (otherwise prop-driven) `theme`. Seeded from `theme`
+    // once; after that the button owns it, same as `defaultValue` for content.
+    const [binaryTheme, setBinaryTheme] = useState<BinaryTheme>(() => resolveInitialBinaryTheme(theme));
+    const binaryThemeRef = useRef(binaryTheme);
+    const displayedTheme: ThemeMode = enableThemeToggle ? binaryTheme : theme;
 
     // The forwarded ref is optional (most consumers never need direct Quill
     // access), so this instance is always tracked internally and only mirrored
@@ -92,6 +136,8 @@ const QuillBlogEditor = forwardRef<Quill, QuillBlogEditorProps>(
       onTextChangeRef.current = onTextChange;
       onSelectionChangeRef.current = onSelectionChange;
       onFileUploadRef.current = onFileUpload;
+      onThemeChangeRef.current = onThemeChange;
+      binaryThemeRef.current = binaryTheme;
     });
 
     useEffect(() => {
@@ -114,7 +160,10 @@ const QuillBlogEditor = forwardRef<Quill, QuillBlogEditorProps>(
       );
       const boundsElement = createTooltipBoundsElement(container);
 
-      const toolbarConfig = toolbar ?? buildToolbarConfig({ fonts, enableTable, enableFormula });
+      const toolbarConfig =
+        toolbar ?? buildToolbarConfig({ fonts, enableTable, enableFormula, enableThemeToggle });
+
+      if (enableThemeToggle) registerThemeToggleIcon(Quill, binaryThemeRef.current);
 
       const quill: Quill = new Quill(editorContainer, {
         theme: 'snow',
@@ -128,6 +177,13 @@ const QuillBlogEditor = forwardRef<Quill, QuillBlogEditorProps>(
             handlers: {
               image: createUploadHandler(() => quill, () => onFileUploadRef.current),
               table: enableTable ? createTableHandler(() => quill) : undefined,
+              'theme-toggle': enableThemeToggle
+                ? createThemeToggleHandler(() => {
+                    const next = binaryThemeRef.current === 'dark' ? 'light' : 'dark';
+                    setBinaryTheme(next);
+                    onThemeChangeRef.current?.(next);
+                  })
+                : undefined,
             },
           },
         },
@@ -135,6 +191,7 @@ const QuillBlogEditor = forwardRef<Quill, QuillBlogEditorProps>(
 
       applyToolbarTitles(quill);
       insertToolbarSeparators(quill);
+      if (enableThemeToggle) updateThemeToggleButton(quill, binaryThemeRef.current);
       setQuillInstance(quill);
 
       // pendingContentRef is set below whenever this effect tears down an
@@ -159,15 +216,28 @@ const QuillBlogEditor = forwardRef<Quill, QuillBlogEditorProps>(
         setQuillInstance(null);
         container.innerHTML = '';
       };
-      // enableTable/enableFormula are plain booleans, safe to rebuild on - the
-      // content-preservation above makes that rebuild invisible to the user.
-      // `fonts`/`toolbar`/`modules` stay mount-time-only: consumers often pass
-      // those as inline arrays/objects, which would otherwise rebuild on every
-      // render.
+      // enableTable/enableFormula/enableThemeToggle are plain booleans, safe to
+      // rebuild on - the content-preservation above makes that rebuild
+      // invisible to the user. `fonts`/`toolbar`/`modules` stay mount-time-only:
+      // consumers often pass those as inline arrays/objects, which would
+      // otherwise rebuild on every render.
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [enableTable, enableFormula, setQuillInstance]);
+    }, [enableTable, enableFormula, enableThemeToggle, setQuillInstance]);
 
-    return <div className={readOnly ? 'ql-readonly' : ''} ref={containerRef}></div>;
+    // Repaints the toolbar button whenever the toggle is clicked (the mount
+    // effect above only sets its *initial* icon/title - see registerThemeToggleIcon).
+    useEffect(() => {
+      if (!enableThemeToggle || !internalRef.current) return;
+      updateThemeToggleButton(internalRef.current, binaryTheme);
+    }, [enableThemeToggle, binaryTheme]);
+
+    return (
+      <div
+        className={`rqbe-theme${readOnly ? ' ql-readonly' : ''}`}
+        data-rqbe-theme={displayedTheme}
+        ref={containerRef}
+      ></div>
+    );
   },
 );
 

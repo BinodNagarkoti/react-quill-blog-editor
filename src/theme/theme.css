@@ -1,0 +1,171 @@
+/*
+ * Theming layer for QuillBlogEditor / QuillBlogViewer.
+ *
+ * Quill's own snow-theme CSS hardcodes its colors. Rather than fork it, every
+ * color it uses is re-declared here as a CSS custom property, scoped under the
+ * `.rqbe-theme` wrapper both components render. The "light" values below match
+ * quill.snow.css / quill.core.css, so the default look (no `theme` prop passed)
+ * is pixel-identical to before this file existed - this is additive, not a
+ * redesign. The one exception is `--rqbe-text`: Quill itself never set an
+ * explicit editor text color (it just inherited from the page), but relying on
+ * literal CSS `inherit` on a custom property is fragile across browsers/timing,
+ * so this hardcodes the same near-black almost every consumer's page already
+ * resolves to instead.
+ *
+ * Every selector here is prefixed with `.rqbe-theme[data-rqbe-theme]` (one
+ * extra class beyond anything Quill's own CSS uses) so it always wins on
+ * specificity, regardless of stylesheet import order.
+ */
+
+.rqbe-theme {
+  --rqbe-bg: transparent;
+  --rqbe-text: #1a1a1a;
+  --rqbe-muted-text: #777;
+  --rqbe-toolbar-bg: transparent;
+  --rqbe-surface: #fff;
+  --rqbe-border: #ccc;
+  --rqbe-icon: #444;
+  --rqbe-icon-active: #06c;
+  --rqbe-accent: #06c;
+  --rqbe-placeholder: rgba(0, 0, 0, 0.6);
+  --rqbe-inline-code-bg: #f0f0f0;
+  --rqbe-code-bg: #23241f;
+  --rqbe-code-text: #f8f8f2;
+  --rqbe-table-border: #000;
+}
+
+.rqbe-theme[data-rqbe-theme='dark'] {
+  --rqbe-bg: #18181b;
+  --rqbe-text: #e4e4e9;
+  --rqbe-muted-text: #9a9aa4;
+  --rqbe-toolbar-bg: var(--rqbe-bg);
+  --rqbe-surface: #242430;
+  --rqbe-border: #3f3f4a;
+  --rqbe-icon: #c7c7d1;
+  --rqbe-icon-active: #818cf8;
+  --rqbe-accent: #818cf8;
+  --rqbe-placeholder: rgba(255, 255, 255, 0.5);
+  --rqbe-inline-code-bg: #26262e;
+  --rqbe-table-border: #4b4b57;
+}
+
+/* theme="auto" follows the OS/browser preference instead of a fixed value. */
+@media (prefers-color-scheme: dark) {
+  .rqbe-theme[data-rqbe-theme='auto'] {
+    --rqbe-bg: #18181b;
+    --rqbe-text: #e4e4e9;
+    --rqbe-muted-text: #9a9aa4;
+    --rqbe-toolbar-bg: var(--rqbe-bg);
+    --rqbe-surface: #242430;
+    --rqbe-border: #3f3f4a;
+    --rqbe-icon: #c7c7d1;
+    --rqbe-icon-active: #818cf8;
+    --rqbe-accent: #818cf8;
+    --rqbe-placeholder: rgba(255, 255, 255, 0.5);
+    --rqbe-inline-code-bg: #26262e;
+    --rqbe-table-border: #4b4b57;
+  }
+}
+
+.rqbe-theme[data-rqbe-theme] .ql-container.ql-snow,
+.rqbe-theme[data-rqbe-theme] .ql-editor {
+  background: var(--rqbe-bg);
+}
+
+.rqbe-theme[data-rqbe-theme] .ql-editor {
+  color: var(--rqbe-text);
+}
+
+.rqbe-theme[data-rqbe-theme] .ql-toolbar.ql-snow {
+  background: var(--rqbe-toolbar-bg);
+}
+
+.rqbe-theme[data-rqbe-theme] .ql-container.ql-snow,
+.rqbe-theme[data-rqbe-theme] .ql-toolbar.ql-snow,
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-tooltip,
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-picker-options,
+.rqbe-theme[data-rqbe-theme] .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-label,
+.rqbe-theme[data-rqbe-theme] .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options,
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-tooltip input[type='text'],
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-tooltip a.ql-action::after {
+  border-color: var(--rqbe-border);
+}
+
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-tooltip,
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-picker-options {
+  background-color: var(--rqbe-surface);
+}
+
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-tooltip {
+  color: var(--rqbe-icon);
+  box-shadow: 0 0 5px var(--rqbe-border);
+}
+
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-stroke,
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-stroke-miter {
+  stroke: var(--rqbe-icon);
+}
+
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-fill,
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-stroke.ql-fill,
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-picker {
+  fill: var(--rqbe-icon);
+  color: var(--rqbe-icon);
+}
+
+.rqbe-theme[data-rqbe-theme] .ql-toolbar.ql-snow button:hover,
+.rqbe-theme[data-rqbe-theme] .ql-toolbar.ql-snow button:focus,
+.rqbe-theme[data-rqbe-theme] .ql-toolbar.ql-snow button.ql-active,
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-picker-label:hover,
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-picker-label.ql-active,
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-picker-item:hover,
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-picker-item.ql-selected {
+  color: var(--rqbe-icon-active);
+}
+
+.rqbe-theme[data-rqbe-theme] .ql-toolbar.ql-snow button:hover .ql-fill,
+.rqbe-theme[data-rqbe-theme] .ql-toolbar.ql-snow button:focus .ql-fill,
+.rqbe-theme[data-rqbe-theme] .ql-toolbar.ql-snow button.ql-active .ql-fill,
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-picker-label:hover .ql-fill,
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-picker-label.ql-active .ql-fill {
+  fill: var(--rqbe-icon-active);
+}
+
+.rqbe-theme[data-rqbe-theme] .ql-toolbar.ql-snow button:hover .ql-stroke,
+.rqbe-theme[data-rqbe-theme] .ql-toolbar.ql-snow button:focus .ql-stroke,
+.rqbe-theme[data-rqbe-theme] .ql-toolbar.ql-snow button.ql-active .ql-stroke,
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-picker-label:hover .ql-stroke,
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-picker-label.ql-active .ql-stroke {
+  stroke: var(--rqbe-icon-active);
+}
+
+.rqbe-theme[data-rqbe-theme] .ql-editor.ql-blank::before {
+  color: var(--rqbe-placeholder);
+}
+
+.rqbe-theme[data-rqbe-theme] .ql-snow .ql-editor a {
+  color: var(--rqbe-accent);
+}
+
+.rqbe-theme[data-rqbe-theme] .ql-editor blockquote {
+  border-left-color: var(--rqbe-border);
+}
+
+.rqbe-theme[data-rqbe-theme] .ql-editor code,
+.rqbe-theme[data-rqbe-theme] .ql-editor .ql-code-block-container {
+  background-color: var(--rqbe-inline-code-bg);
+}
+
+.rqbe-theme[data-rqbe-theme] .ql-editor .ql-code-block-container {
+  background-color: var(--rqbe-code-bg);
+  color: var(--rqbe-code-text);
+}
+
+.rqbe-theme[data-rqbe-theme] .ql-editor td {
+  border-color: var(--rqbe-table-border);
+}
+
+.rqbe-theme[data-rqbe-theme] .ql-editor li[data-list='checked'] > .ql-ui,
+.rqbe-theme[data-rqbe-theme] .ql-editor li[data-list='unchecked'] > .ql-ui {
+  color: var(--rqbe-muted-text);
+}

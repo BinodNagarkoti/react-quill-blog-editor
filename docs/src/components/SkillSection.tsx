@@ -5,7 +5,8 @@ const NPX_SNIPPET = 'npx react-quill-blog-editor';
 
 export function SkillSection() {
   return (
-    <section className="docs-section">
+    <section className="docs-section" id="skill">
+      <p className="docs-eyebrow">Reference</p>
       <h2>For AI coding agents</h2>
       <p className="docs-note">
         This package ships an <a href="https://claude.com/claude-code" target="_blank" rel="noreferrer">

@@ -6,18 +6,20 @@ export interface ToolbarFeatureFlags {
   fonts: FontOption[];
   enableTable: boolean;
   enableFormula: boolean;
+  enableThemeToggle: boolean;
 }
 
 export function buildToolbarConfig({
   fonts,
   enableTable,
   enableFormula,
+  enableThemeToggle,
 }: ToolbarFeatureFlags): ToolbarConfig {
   const embeds = ['link', 'image'];
   if (enableTable) embeds.push('table');
   if (enableFormula) embeds.push('formula');
 
-  return [
+  const config: ToolbarConfig = [
     [{ font: fontToolbarValues(fonts) }],
     [{ header: [1, 2, 3, 4, 5, 6, false] }],
     [{ size: ['small', false, 'large', 'huge'] }],
@@ -33,4 +35,8 @@ export function buildToolbarConfig({
     embeds,
     ['clean'],
   ];
+
+  if (enableThemeToggle) config.push(['theme-toggle']);
+
+  return config;
 }

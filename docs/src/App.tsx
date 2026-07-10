@@ -1,7 +1,10 @@
+import { Nav } from './components/Nav.tsx';
 import { Hero } from './components/Hero.tsx';
+import { Features } from './components/Features.tsx';
 import { CodeBlock } from './components/CodeBlock.tsx';
 import { PropsTable } from './components/PropsTable.tsx';
 import { Playground } from './components/Playground.tsx';
+import { Theming } from './components/Theming.tsx';
 import { SkillSection } from './components/SkillSection.tsx';
 import './App.css';
 
@@ -53,14 +56,18 @@ window.katex = katex; // Quill's formula format renders through window.katex
 function App() {
   return (
     <>
+      <Nav />
       <Hero />
+      <Features />
       <div className="docs">
         <section className="docs-section" id="install">
+          <p className="docs-eyebrow">Setup</p>
           <h2>Install</h2>
           <CodeBlock code={INSTALL_SNIPPET} language="bash" />
         </section>
 
-        <section className="docs-section">
+        <section className="docs-section" id="usage">
+          <p className="docs-eyebrow">Setup</p>
           <h2>Usage</h2>
           <CodeBlock code={USAGE_SNIPPET} />
           <p className="docs-note">
@@ -71,12 +78,14 @@ function App() {
           </p>
         </section>
 
-        <section className="docs-section">
+        <section className="docs-section" id="formulas">
+          <p className="docs-eyebrow">Setup</p>
           <h2>Formulas (optional)</h2>
           <CodeBlock code={FORMULA_SNIPPET} />
         </section>
 
-        <section className="docs-section">
+        <section className="docs-section" id="toolbar">
+          <p className="docs-eyebrow">Reference</p>
           <h2>Toolbar</h2>
           <p className="docs-note">
             The default toolbar includes font, header (H1-H6), size, bold/italic/underline/strike,
@@ -90,13 +99,28 @@ function App() {
           </p>
         </section>
 
-        <section className="docs-section">
+        <section className="docs-section" id="theming">
+          <p className="docs-eyebrow">Reference</p>
+          <h2>Theming</h2>
+          <p className="docs-note">
+            Both components ship a built-in light theme (the default) and dark theme, plus{' '}
+            <code>theme=&quot;auto&quot;</code> to follow the OS/browser&rsquo;s{' '}
+            <code>prefers-color-scheme</code>. Pass <code>enableThemeToggle</code> to{' '}
+            <code>QuillBlogEditor</code> for a sun/moon button right in the toolbar, so readers can
+            flip it themselves with no external control needed - live, no remount, no lost content.
+          </p>
+          <Theming />
+        </section>
+
+        <section className="docs-section" id="playground">
+          <p className="docs-eyebrow">Try it</p>
           <h2>Playground</h2>
           <p className="docs-note">Toggle props and watch the editor and the code stay in sync.</p>
           <Playground />
         </section>
 
-        <section className="docs-section">
+        <section className="docs-section" id="props">
+          <p className="docs-eyebrow">Reference</p>
           <h2>Props</h2>
           <PropsTable />
           <p className="docs-note">
@@ -110,11 +134,16 @@ function App() {
         </section>
 
         <SkillSection />
-
-        <footer className="docs-footer">
-          <p>MIT licensed. Built on Quill 2.</p>
-        </footer>
       </div>
+
+      <footer className="site-footer">
+        <div className="site-footer-inner">
+          <span>MIT licensed. Built on Quill 2.</span>
+          <a href="https://github.com/BinodNagarkoti/react-quill-blog-editor" target="_blank" rel="noreferrer">
+            GitHub
+          </a>
+        </div>
+      </footer>
     </>
   );
 }

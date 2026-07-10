@@ -29,6 +29,9 @@ export function injectToolbarStyles(): void {
   font-size: 15px;
   user-select: none;
   pointer-events: none;
+}
+.ql-readonly .ql-toolbar {
+  display: none;
 }`;
 }
 

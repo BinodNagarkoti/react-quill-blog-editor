@@ -1,23 +1,13 @@
 {
   "name": "react-quill-blog-editor",
-  "version": "0.1.0",
-  "description": "A React wrapper around Quill 2 preconfigured for blog content: fonts, tables, colors, alignment, line spacing, and non-base64 image uploads.",
+  "version": "0.2.0",
+  "description": "A React wrapper around Quill 2 preconfigured for blog content: fonts, tables, colors, alignment, line spacing, light/dark theming, non-base64 image uploads, and a read-only viewer for displaying saved posts.",
   "type": "module",
   "license": "MIT",
-  "keywords": [
-    "react",
-    "quill",
-    "rich-text-editor",
-    "wysiwyg",
-    "blog"
-  ],
-  "files": [
-    "dist",
-    "bin",
-    ".claude/skills/react-quill-blog-editor/SKILL.md"
-  ],
+  "keywords": ["react", "quill", "rich-text-editor", "wysiwyg", "blog"],
+  "files": ["dist", "bin", ".claude/skills/react-quill-blog-editor/SKILL.md"],
   "bin": {
-    "react-quill-blog-editor": "bin/cli.js"
+    "react-quill-blog-editor": "./bin/cli.js"
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -30,9 +20,7 @@
     },
     "./style.css": "./dist/style.css"
   },
-  "sideEffects": [
-    "*.css"
-  ],
+  "sideEffects": ["*.css"],
   "scripts": {
     "dev": "vite --config example/vite.config.ts",
     "build": "vite build && tsc -p tsconfig.build.json",

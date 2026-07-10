@@ -61,17 +61,26 @@ export function Playground() {
         instead.
       </p>
       <div className="playground-controls">
-        <label>
+        <label className="toggle">
           <input type="checkbox" checked={readOnly} onChange={(e) => setReadOnly(e.target.checked)} />
-          readOnly
+          <span className="toggle-track">
+            <span className="toggle-thumb" />
+          </span>
+          <span className="toggle-label">readOnly</span>
         </label>
-        <label>
+        <label className="toggle">
           <input type="checkbox" checked={enableTable} onChange={(e) => setEnableTable(e.target.checked)} />
-          enableTable
+          <span className="toggle-track">
+            <span className="toggle-thumb" />
+          </span>
+          <span className="toggle-label">enableTable</span>
         </label>
-        <label>
+        <label className="toggle">
           <input type="checkbox" checked={enableFormula} onChange={(e) => setEnableFormula(e.target.checked)} />
-          enableFormula
+          <span className="toggle-track">
+            <span className="toggle-thumb" />
+          </span>
+          <span className="toggle-label">enableFormula</span>
         </label>
 
         <div className="playground-preset">
